@@ -6,6 +6,7 @@ export async function GET() {
   if (!LARAVEL_API_URL) {
     return NextResponse.json({ message: "Laravel API URL is not configured." }, { status: 500 })
   }
+
   try {
     const response = await fetch(`${LARAVEL_API_URL}/cheque-vouchers`, {
       headers: {
@@ -13,6 +14,7 @@ export async function GET() {
       },
       cache: "no-store", // Ensure fresh data
     })
+
     if (!response.ok) {
       const errorText = await response.text()
       try {
@@ -32,6 +34,7 @@ export async function GET() {
         )
       }
     }
+
     const data = await response.json()
     return NextResponse.json(data)
   } catch (error: any) {
@@ -45,11 +48,13 @@ export async function POST(request: Request) {
   if (!LARAVEL_API_URL) {
     return NextResponse.json({ message: "Laravel API URL is not configured." }, { status: 500 })
   }
+
   try {
     const response = await fetch(`${LARAVEL_API_URL}/cheque-vouchers`, {
       method: "POST",
       body: formData,
     })
+
     if (!response.ok) {
       const errorText = await response.text()
       try {
@@ -69,6 +74,7 @@ export async function POST(request: Request) {
         )
       }
     }
+
     const data = await response.json()
     return NextResponse.json(data)
   } catch (error: any) {

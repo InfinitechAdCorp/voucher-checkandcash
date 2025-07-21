@@ -2,8 +2,8 @@ import { NextResponse } from "next/server"
 
 const LARAVEL_API_URL = process.env.NEXT_PUBLIC_API_URL
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params // Await params
   if (!LARAVEL_API_URL) {
     return NextResponse.json({ message: "Laravel API URL is not configured." }, { status: 500 })
   }
@@ -42,8 +42,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params // Await params
   const body = await request.json() // For JSON payload (like status update)
   if (!LARAVEL_API_URL) {
     return NextResponse.json({ message: "Laravel API URL is not configured." }, { status: 500 })
@@ -84,8 +84,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 // This POST method is specifically for handling FormData with _method=PUT for file uploads
-export async function POST(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params // Await params
   const formData = await request.formData()
   if (!LARAVEL_API_URL) {
     return NextResponse.json({ message: "Laravel API URL is not configured." }, { status: 500 })
