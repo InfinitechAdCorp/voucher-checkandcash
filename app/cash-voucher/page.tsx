@@ -509,7 +509,7 @@ export default function CashVoucher() {
               </div>
               {/* Title */}
               <div className="flex-grow text-center">
-                <h2 className="text-base font-bold underline">CASH VOUCHER</h2>
+                <h2 className="text-base font-bold underline mr-32">CASH VOUCHER</h2>
               </div>
             </div>
             {/* Header Info */}
@@ -568,7 +568,10 @@ export default function CashVoucher() {
                         className="grid grid-cols-[8fr_3fr_1fr] min-h-[25px] last:border-b-0"
                       >
                         <div className="px-2 py-1 whitespace-pre-wrap text-sm">{particular?.description || ""}</div>
-                        <div className="px-2 py-1 text-right text-sm">{particular ? whole : ""}</div>
+                        <div className="px-2 py-1 text-right text-sm">
+  {particular ? Number(whole).toLocaleString() : ""}
+</div>
+
                         <div className="px-2 py-1 text-left text-sm">{particular ? `.${cents}` : ""}</div>
                       </div>
                     )
@@ -581,7 +584,10 @@ export default function CashVoucher() {
                     const [totalWhole, totalCents] = calculateTotal().split(".")
                     return (
                       <>
-                        <div className="p-2 text-right">{totalWhole}</div>
+<div className="p-2 text-right">
+  {Number(totalWhole).toLocaleString()}
+</div>
+
                         <div className="p-2 text-left">.{totalCents}</div>
                       </>
                     )

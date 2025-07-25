@@ -1,4 +1,5 @@
 "use client"
+
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
@@ -71,7 +72,6 @@ export default function CashVoucherViewPage() {
           setIsLoading(false)
         }
       }
-
       fetchVoucher()
     }
   }, [id, toast])
@@ -100,12 +100,10 @@ export default function CashVoucherViewPage() {
     if (!relativePath) {
       return "/placeholder.svg" // Fallback to placeholder if no path
     }
-
     // If the path already starts with http/https, return as is (for backward compatibility)
     if (relativePath.startsWith("http://") || relativePath.startsWith("https://")) {
       return relativePath
     }
-
     // If it's a relative path starting with /signatures/, construct the full URL
     if (relativePath.startsWith("/signatures/")) {
       if (!LARAVEL_API_URL) {
@@ -119,7 +117,6 @@ export default function CashVoucherViewPage() {
       }
       return `${baseUrl}${relativePath}`
     }
-
     // For any other format, try to construct the URL
     if (LARAVEL_API_URL) {
       let baseUrl = LARAVEL_API_URL.endsWith("/") ? LARAVEL_API_URL.slice(0, -1) : LARAVEL_API_URL
@@ -129,7 +126,6 @@ export default function CashVoucherViewPage() {
       }
       return `${baseUrl}/${relativePath}`
     }
-
     return "/placeholder.svg"
   }
 
@@ -176,17 +172,20 @@ export default function CashVoucherViewPage() {
           </span>
         </div>
 
-        {/* Particulars Table */}
+        {/* Particulars Table - Fixed Structure */}
         <div className="border border-black mb-4">
-          <div className="grid grid-cols-[70%_30%] border-b border-black bg-gray-100 h-8 items-center">
-            <div className="border-r border-black flex items-center justify-center font-semibold uppercase text-sm">
+          {/* Table Header */}
+          <div className="flex border-b border-black bg-gray-100 h-8">
+            <div className="flex-1 border-r border-black flex items-center justify-center font-semibold uppercase text-sm">
               Particulars
             </div>
-            <div className="flex items-center justify-center font-semibold uppercase text-sm">Amount</div>
+            <div className="w-[250px] flex items-center justify-center font-semibold uppercase text-sm">Amount</div>
           </div>
-          <div className="grid grid-cols-[70%_30%] min-h-[200px] relative">
-            <div className="absolute inset-y-0 left-[70%] w-px bg-black"></div> {/* Vertical separator */}
-            <div className="p-2 text-sm flex flex-col">
+
+          {/* Table Body */}
+          <div className="flex min-h-[200px]">
+            {/* Particulars Column */}
+            <div className="flex-1 border-r border-black p-2 text-sm">
               {voucher.particulars.length > 0 ? (
                 voucher.particulars.map((p, index) => (
                   <div key={p.id || index} className="mb-1">
@@ -197,10 +196,11 @@ export default function CashVoucherViewPage() {
                 <div className="text-gray-500">No particulars listed.</div>
               )}
             </div>
-            <div className="grid grid-cols-[1fr_auto] relative">
-              <div className="absolute inset-y-0 right-[80px] w-px bg-black"></div>{" "}
-              {/* Vertical separator for amount */}
-              <div className="p-2 text-right text-sm flex flex-col h-full">
+
+            {/* Amount Column */}
+            <div className="w-[250px] flex">
+              {/* Integer Part */}
+              <div className="flex-1 border-r border-black p-2 text-right text-sm">
                 {voucher.particulars.length > 0 ? (
                   voucher.particulars.map((p, index) => (
                     <div key={p.id || index} className="mb-1">
@@ -211,7 +211,8 @@ export default function CashVoucherViewPage() {
                   <>&nbsp;</>
                 )}
               </div>
-              <div className="w-[80px] p-2 text-sm flex flex-col h-full">
+              {/* Decimal Part */}
+              <div className="w-[60px] p-2 text-left text-sm">
                 {voucher.particulars.length > 0 ? (
                   voucher.particulars.map((p, index) => (
                     <div key={p.id || index} className="mb-1">
@@ -224,73 +225,81 @@ export default function CashVoucherViewPage() {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-[70%_30%] border-t border-black bg-gray-100 h-8 items-center">
-            <div className="border-r border-black flex items-center px-2 font-semibold text-sm">TOTAL P</div>
-            <div className="grid grid-cols-[1fr_auto] relative">
-              <div className="absolute inset-y-0 right-[80px] w-px bg-black"></div>
-              <div className="flex items-center justify-end px-2 font-semibold text-sm">{totalAmountInteger}</div>
-              <div className="w-[80px] flex items-center px-2 font-semibold text-sm">.{totalAmountDecimal}</div>
+
+          {/* Table Footer - Total Row */}
+          <div className="flex border-t border-black bg-gray-100 h-8">
+           <div className="flex-1 border-r border-black flex items-center justify-end px-2 font-semibold text-sm">
+  TOTAL ₱
+</div>
+
+            <div className="w-[250px] flex">
+              <div className="flex-1 border-r border-black flex items-center justify-end px-2 font-semibold text-sm">
+  {Number(totalAmountInteger).toLocaleString()}
+</div>
+
+              <div className="w-[60px] flex items-center px-2 font-semibold text-sm">.{totalAmountDecimal}</div>
             </div>
           </div>
         </div>
 
         {/* Signatures Section */}
-        <div className="flex justify-between mt-6 text-sm">
-          <div className="text-left flex-1 mr-4">
-            <div className="mb-1 font-semibold">Received by:</div>
-            <div className="mt-8">
-              <div className="flex flex-col items-center text-center relative min-h-[40px]">
+        <div className="flex justify-between mt-8 text-sm">
+          <div className="flex-1 mr-8">
+            <div className="mb-4 font-semibold">Received by:</div>
+            <div className="flex gap-4 mb-8">
+              <div className="flex-1">
                 {voucher.received_by_signature_url && (
-                  <div className="absolute bottom-[calc(100%-8px)] left-1/2 -translate-x-1/2">
+                  <div className="mb-2 flex justify-center">
                     <Image
                       src={getSignatureUrl(voucher.received_by_signature_url) || "/placeholder.svg"}
                       alt="Received By Signature"
-                      width={100}
-                      height={50}
-                      className="max-h-10 max-w-[100px] mx-auto object-contain"
+                      width={120}
+                      height={60}
+                      className="max-h-12 max-w-[120px] object-contain"
                       crossOrigin="anonymous"
                     />
                   </div>
                 )}
-                <div className="min-h-[18px] flex items-end justify-center border-b border-black w-full">
-                  <span className="pb-1">{voucher.received_by_name || "____________________"}</span>
+                <div className="border-b border-black min-h-[20px] mb-1 text-center pb-1">
+                  {voucher.received_by_name || ""}
                 </div>
-                <div className="pt-1 text-xs whitespace-nowrap">PRINTED NAME AND SIGNATURE</div>
+                <div className="text-xs text-center uppercase">PRINTED NAME AND SIGNATURE</div>
               </div>
-              <div className="flex flex-col items-center text-center w-full mt-4">
-                <div className="min-h-[18px] flex items-end justify-center border-b border-black w-full">
-                  <span className="pb-1">{formatDate(voucher.received_by_date) || "____________________"}</span>
+              <div className="w-32">
+                <div className="border-b border-black min-h-[20px] mb-1 text-center pb-1 mt-14">
+                  {formatDate(voucher.received_by_date) || ""}
                 </div>
-                <div className="pt-1 text-xs whitespace-nowrap">DATE</div>
+                <div className="text-xs text-center uppercase">DATE</div>
               </div>
             </div>
           </div>
-          <div className="text-left flex-1 ml-4">
-            <div className="mb-1 font-semibold">Approved by:</div>
-            <div className="mt-8">
-              <div className="flex flex-col items-center text-center relative min-h-[40px]">
+
+          <div className="flex-1 ml-8">
+            <div className="mb-4 font-semibold">Approved by:</div>
+            <div className="flex gap-4 mb-8">
+              <div className="flex-1">
                 {voucher.approved_by_signature_url && (
-                  <div className="absolute bottom-[calc(100%-8px)] left-1/2 -translate-x-1/2">
+                  <div className="mb-2 flex justify-center">
                     <Image
                       src={getSignatureUrl(voucher.approved_by_signature_url) || "/placeholder.svg"}
                       alt="Approved By Signature"
-                      width={100}
-                      height={50}
-                      className="max-h-10 max-w-[100px] mx-auto object-contain"
+                      width={120}
+                      height={60}
+                      className="max-h-12 max-w-[120px] object-contain"
                       crossOrigin="anonymous"
                     />
                   </div>
                 )}
-                <div className="min-h-[18px] flex items-end justify-center border-b border-black w-full">
-                  <span className="pb-1">{voucher.approved_by_name || "____________________"}</span>
+                <div className="border-b border-black min-h-[20px] mb-1 text-center pb-1">
+                  {voucher.approved_by_name || ""}
                 </div>
-                <div className="pt-1 text-xs whitespace-nowrap">PRINTED NAME AND SIGNATURE</div>
+                <div className="text-xs text-center uppercase">PRINTED NAME AND SIGNATURE</div>
               </div>
-              <div className="flex flex-col items-center text-center w-full mt-4">
-                <div className="min-h-[18px] flex items-end justify-center border-b border-black w-full">
-                  <span className="pb-1">{formatDate(voucher.approved_by_date) || "____________________"}</span>
+              <div className="w-32">
+                <div className="border-b border-black min-h-[20px] mb-1 text-center pb-1 mt-14">
+                  {formatDate(voucher.approved_by_date) || ""}
                 </div>
-                <div className="pt-1 text-xs whitespace-nowrap">DATE</div>
+                <div className="text-xs text-center uppercase">DATE</div>
               </div>
             </div>
           </div>

@@ -525,7 +525,7 @@ export default function ChequeVoucher() {
               </div>
               {/* Title */}
               <div className="flex-grow text-center">
-                <h2 className="text-base font-bold underline">CHEQUE VOUCHER</h2>
+                <h2 className="text-base font-bold underline mr-32">CHEQUE VOUCHER</h2>
               </div>
             </div>
             {/* Header Info */}
@@ -643,16 +643,20 @@ export default function ChequeVoucher() {
                   <div className="absolute inset-y-0 right-[80px] w-px bg-black"></div>
                   {/* Whole number part (left sub-column of Amount) */}
                   <div className="px-2 py-2 text-right text-sm flex flex-col h-full">
-                    <div className="flex-grow flex items-end justify-end">
-                      {formData.amount ? `₱${Math.floor(Number.parseFloat(formData.amount))}` : ""}
-                    </div>
+                   <div className="flex-grow flex items-end justify-end">
+  {formData.amount ? `₱${Math.floor(Number(formData.amount)).toLocaleString()}` : ""}
+</div>
+
                   </div>
                   {/* Cents part (right sub-column of Amount) */}
                   <div className="w-[80px] px-2 py-2 text-sm flex flex-col h-full">
                     <div className="flex-grow flex items-start justify-start"></div>
                     <div className="pt-1 flex items-end justify-start">
-                      {formData.amount ? Number.parseFloat(formData.amount).toFixed(2).split(".")[1] : "00"}
-                    </div>
+  {formData.amount
+    ? `.${Number(formData.amount).toFixed(2).split(".")[1]}`
+    : ".00"}
+</div>
+
                   </div>
                 </div>
               </div>
