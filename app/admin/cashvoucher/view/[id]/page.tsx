@@ -147,30 +147,38 @@ export default function CashVoucherViewPage() {
               crossOrigin="anonymous"
             />
           </div>
-          <div className="flex-grow text-center pt-2">
+          <div className="flex-grow text-center pt-2 mr-48">
             <h2 className="text-base font-bold underline uppercase">Cash Voucher</h2>
           </div>
-          <div className="flex-shrink-0 text-right space-y-1 text-sm">
-            <div className="flex items-center justify-end mt-16">
-              <span className="font-semibold mr-2">Voucher No:</span>
-              <span className="border-b border-black min-w-[120px] text-right px-1">{voucher.voucher_no || "N/A"}</span>
-            </div>
-            <div className="flex items-center justify-end">
-              <span className="font-semibold mr-2">Date:</span>
-              <span className="border-b border-black min-w-[120px] text-right px-1">
-                {formatDate(voucher.date) || "N/A"}
-              </span>
-            </div>
-          </div>
+          
         </div>
 
         {/* Paid To Section */}
-        <div className="flex items-center mb-4">
-          <span className="font-semibold mr-2">Paid to:</span>
-          <span className="border-b border-black w-[150px] min-h-[1.5rem] pb-1 text-sm">
-            {voucher.paid_to || "N/A"}
-          </span>
-        </div>
+       <div className="flex justify-between items-start mb-4">
+  {/* Left: Paid To */}
+  <div className="flex items-center mt-7">
+    <span className="font-semibold mr-2">Paid to:</span>
+    <span className="border-b border-black w-[150px] min-h-[1.5rem] pb-1 text-sm">
+      {voucher.paid_to || "N/A"}
+    </span>
+  </div>
+
+  {/* Right: Voucher No and Date */}
+  <div className="text-right space-y-1 text-sm">
+    <div className="flex items-center justify-end">
+      <span className="font-semibold mr-2">Voucher No:</span>
+      <span className="border-b border-black min-w-[120px] text-right px-1">
+        {voucher.voucher_no || "N/A"}
+      </span>
+    </div>
+    <div className="flex items-center justify-end">
+      <span className="font-semibold mr-2">Date:</span>
+      <span className="border-b border-black min-w-[120px] text-right px-1">
+        {formatDate(voucher.date) || "N/A"}
+      </span>
+    </div>
+  </div>
+</div>
 
         {/* Particulars Table - Fixed Structure */}
         <div className="border border-black mb-4">
@@ -204,7 +212,7 @@ export default function CashVoucherViewPage() {
                 {voucher.particulars.length > 0 ? (
                   voucher.particulars.map((p, index) => (
                     <div key={p.id || index} className="mb-1">
-                      {Math.floor(Number.parseFloat(p.amount.toString()))}
+                     ₱ {Math.floor(Number.parseFloat(p.amount.toString()))}
                     </div>
                   ))
                 ) : (
@@ -227,14 +235,14 @@ export default function CashVoucherViewPage() {
           </div>
 
           {/* Table Footer - Total Row */}
-          <div className="flex border-t border-black bg-gray-100 h-8">
+          <div className="flex h-8">
            <div className="flex-1 border-r border-black flex items-center justify-end px-2 font-semibold text-sm">
-  TOTAL ₱
+  TOTAL 
 </div>
 
             <div className="w-[250px] flex">
               <div className="flex-1 border-r border-black flex items-center justify-end px-2 font-semibold text-sm">
-  {Number(totalAmountInteger).toLocaleString()}
+  ₱ {Number(totalAmountInteger).toLocaleString()}
 </div>
 
               <div className="w-[60px] flex items-center px-2 font-semibold text-sm">.{totalAmountDecimal}</div>

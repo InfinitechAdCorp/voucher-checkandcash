@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useToast } from "@/hooks/use-toast"
-import { Eye, Pencil, Trash2, PlusCircle, ChevronLeft, ChevronRight } from "lucide-react"
+import { Eye, Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
 import LoadingWrapper from "@/components/loading-wrapper"
 
 interface CashVoucher {
@@ -14,6 +14,10 @@ interface CashVoucher {
   voucher_no: string
   date: string
   total_amount: number
+  check_no: string
+  account_name: string
+  account_number: string
+  bank_amount: number
   status: string
 }
 
@@ -44,7 +48,7 @@ export default function CashVoucherPage() {
       }
       const data: PaginatedResponse = await response.json()
 
-      // ✅ Handle paginated response structure
+      // Handle paginated response structure
       if (!data.data || !Array.isArray(data.data)) {
         throw new Error("Invalid data format: Expected paginated response with data array")
       }
@@ -106,6 +110,7 @@ export default function CashVoucherPage() {
         title: "Success",
         description: "Cash voucher status updated to 'cancelled'.",
       })
+
       fetchVouchers(currentPage) // Re-fetch vouchers to show updated status
     } catch (error: any) {
       console.error("Error cancelling cash voucher:", error)
@@ -134,9 +139,9 @@ export default function CashVoucherPage() {
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Cash Vouchers</h1>
-        <Button onClick={() => router.push("/admin/cashvoucher/new")}>
+        {/* <Button onClick={() => router.push("/admin/cashvoucher/new")}>
           <PlusCircle className="mr-2 h-4 w-4" /> Add New Voucher
-        </Button>
+        </Button> */}
       </div>
 
       {vouchers.length === 0 ? (
@@ -150,7 +155,8 @@ export default function CashVoucherPage() {
                   <TableHead>Voucher No</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Paid To</TableHead>
-                  <TableHead className="text-right">Total Amount</TableHead>
+               
+                  <TableHead className="text-right">Amount</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -161,13 +167,15 @@ export default function CashVoucherPage() {
                     <TableCell className="font-medium">{voucher.voucher_no}</TableCell>
                     <TableCell>{new Date(voucher.date).toLocaleDateString()}</TableCell>
                     <TableCell>{voucher.paid_to}</TableCell>
+        
+                  
                     <TableCell className="text-right">
-  ₱{Number(voucher.total_amount).toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })}
-</TableCell>
-
+                      ₱
+                      {Number(voucher.total_amount).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </TableCell>
                     <TableCell className="capitalize">{voucher.status}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-2">

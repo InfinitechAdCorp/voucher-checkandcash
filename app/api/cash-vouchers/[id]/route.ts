@@ -4,9 +4,11 @@ const LARAVEL_API_URL = process.env.NEXT_PUBLIC_API_URL
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params // Await params
+
   if (!LARAVEL_API_URL) {
     return NextResponse.json({ message: "Laravel API URL is not configured." }, { status: 500 })
   }
+
   try {
     const response = await fetch(`${LARAVEL_API_URL}/cash-vouchers/${id}`, {
       headers: {
@@ -14,6 +16,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       },
       cache: "no-store", // Ensure fresh data
     })
+
     if (!response.ok) {
       const errorData = await response.json()
       return NextResponse.json(
@@ -21,6 +24,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         { status: response.status },
       )
     }
+
     const data = await response.json()
     return NextResponse.json(data)
   } catch (error: any) {
@@ -32,9 +36,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params // Await params
   const body = await request.json() // For JSON payload (like status update)
+
   if (!LARAVEL_API_URL) {
     return NextResponse.json({ message: "Laravel API URL is not configured." }, { status: 500 })
   }
+
   try {
     const response = await fetch(`${LARAVEL_API_URL}/cash-vouchers/${id}`, {
       method: "PUT",
@@ -43,6 +49,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       },
       body: JSON.stringify(body),
     })
+
     if (!response.ok) {
       const errorData = await response.json()
       return NextResponse.json(
@@ -50,6 +57,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         { status: response.status },
       )
     }
+
     const data = await response.json()
     return NextResponse.json(data)
   } catch (error: any) {
@@ -62,14 +70,17 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params // Await params
   const formData = await request.formData()
+
   if (!LARAVEL_API_URL) {
     return NextResponse.json({ message: "Laravel API URL is not configured." }, { status: 500 })
   }
+
   try {
     const response = await fetch(`${LARAVEL_API_URL}/cash-vouchers/${id}`, {
       method: "POST", // Laravel expects POST for FormData with _method=PUT
       body: formData,
     })
+
     if (!response.ok) {
       const errorData = await response.json()
       return NextResponse.json(
@@ -77,6 +88,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         { status: response.status },
       )
     }
+
     const data = await response.json()
     return NextResponse.json(data)
   } catch (error: any) {

@@ -1,4 +1,5 @@
 "use client"
+
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -24,6 +25,16 @@ interface ChequeVoucher {
   approved_by_signature_url: string | null
   approved_by_date: string
   status: string // Not displayed in this layout, but kept in interface
+}
+
+const formatDate = (dateString: string) => {
+  if (!dateString) return ""
+  const date = new Date(dateString)
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })
 }
 
 export default function ChequeVoucherViewPage() {
@@ -60,7 +71,6 @@ export default function ChequeVoucherViewPage() {
           setIsLoading(false)
         }
       }
-
       fetchVoucher()
     }
   }, [id, toast])
@@ -90,12 +100,10 @@ export default function ChequeVoucherViewPage() {
     if (!relativePath) {
       return "/placeholder.svg" // Fallback to placeholder if no path
     }
-
     // If the path already starts with http/https, return as is (for backward compatibility)
     if (relativePath.startsWith("http://") || relativePath.startsWith("https://")) {
       return relativePath
     }
-
     // If it's a relative path starting with /signatures/, construct the full URL
     if (relativePath.startsWith("/signatures/")) {
       if (!LARAVEL_API_URL) {
@@ -105,13 +113,11 @@ export default function ChequeVoucherViewPage() {
       const baseUrl = LARAVEL_API_URL.endsWith("/") ? LARAVEL_API_URL.slice(0, -1) : LARAVEL_API_URL
       return `${baseUrl}${relativePath}`
     }
-
     // For any other format, try to construct the URL
     if (LARAVEL_API_URL) {
       const baseUrl = LARAVEL_API_URL.endsWith("/") ? LARAVEL_API_URL.slice(0, -1) : LARAVEL_API_URL
       return `${baseUrl}/${relativePath}`
     }
-
     return "/placeholder.svg"
   }
 
@@ -123,127 +129,142 @@ export default function ChequeVoucherViewPage() {
       <div className="border border-gray-300 p-6 rounded-lg shadow-sm bg-white max-w-3xl mx-auto">
         {/* Header Section */}
         <div className="flex justify-between items-start mb-6">
-          <div className="flex items-center">
-            <Image src="/logo.png" alt="ABIC Realty Logo" width={60} height={60} className="mr-2" />
-            <div className="text-sm">
-              <p className="font-bold">ABIC Realty</p>
-              <p>&amp; Consultancy Corporation</p>
-            </div>
+          <div className="flex-shrink-0 mr-4">
+            <Image
+              src="/logo.png" // Using the provided image URL
+              alt="ABIC Realty Logo"
+              width={150}
+              height={56}
+              className="max-h-14 max-w-[150px] object-contain"
+              crossOrigin="anonymous"
+            />
           </div>
           <div className="flex-grow text-center">
-            <h1 className="text-xl font-bold underline">CHEQUE VOUCHER</h1>
+            <h1 className="text-xl font-bold underline mt-6 mr-32">CHEQUE VOUCHER</h1>
           </div>
+        </div>
+        <div className="mb-6 flex justify-between items-start">
+          {/* Left side: Paid to */}
+          <div className="flex items-center">
+            <p className=" mr-2 mt-6">Paid to:</p>
+            <p className="w-64 border-b border-black text-lg mt-2">{voucher.paid_to}</p>
+          </div>
+          {/* Right side: Voucher No and Date */}
           <div className="text-right text-sm">
             <p className="mb-1">
               Voucher No: <span className="font-semibold border-b border-black px-2">{voucher.voucher_no}</span>
             </p>
             <p>
-              Date:{" "}
-              <span className="font-semibold border-b border-black px-2">
-                {new Date(voucher.date).toLocaleDateString()}
+              <span className="mr-2">Date:</span>
+              <span className="font-semibold border-b border-black px-4">
+                {new Date(voucher.date).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "2-digit",
+                })}
               </span>
             </p>
           </div>
         </div>
-
-        {/* Paid To Section */}
-        <div className="mb-6 flex items-center">
-          <p className="font-semibold mr-2">Paid to:</p>
-          <p className="flex-grow border-b border-black text-lg font-medium">{voucher.paid_to}</p>
-        </div>
-
         {/* Particulars and Amount Table */}
         <div className="border border-black mb-6">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-black p-2 text-left w-3/4">PARTICULARS</th>
-                <th className="border border-black p-2 text-left w-1/4">AMOUNT</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="h-40 align-top">
-                <td className="border border-black p-2">{voucher.purpose}</td>
-                <td className="border border-black p-2 text-right align-top">
-                  <div className="flex justify-end items-center h-full">
-                    <span className="mr-1">₱</span>
-                    <span className="font-semibold">{wholeAmount}</span>
-                    <span className="ml-1">.{decimalAmount}</span>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td className="border border-black p-2 text-right font-bold">TOTAL ₱</td>
-                <td className="border border-black p-2 text-right font-bold">
-                  <div className="flex justify-end items-center">
-                    <span className="mr-1">₱</span>
-                    <span>{wholeAmount}</span>
-                    <span className="ml-1">.{decimalAmount}</span>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+          {/* Header Row */}
+          <div className="flex border-b border-black">
+            <div className="flex-1 border-r border-black p-2 text-left font-bold bg-gray-100">PARTICULARS</div>
+            <div className="w-[250px] border-black p-2 text-left font-bold bg-gray-100">AMOUNT</div>
+          </div>
 
-        {/* Signatures Section */}
-        <div className="grid grid-cols-2 gap-8 mt-8">
-          <div>
-            <p className="font-semibold mb-4">Received by:</p>
-            <div className="flex flex-col items-center mb-4">
-              {voucher.received_by_signature_url ? (
-                <Image
-                  src={getSignatureUrl(voucher.received_by_signature_url) || "/placeholder.svg"}
-                  alt="Received By Signature"
-                  width={150}
-                  height={80}
-                  className="border border-gray-300 mb-2"
-                  crossOrigin="anonymous"
-                />
-              ) : (
-                <div className="w-[150px] h-[80px] border border-gray-300 flex items-center justify-center text-gray-400 text-xs mb-2">
-                  No Signature
-                </div>
-              )}
-              <p className="border-b border-black w-full text-center py-1 text-sm font-medium">
-                {voucher.received_by_name}
-              </p>
-              <p className="text-xs mt-1">PRINTED NAME AND SIGNATURE</p>
-            </div>
-            <div className="flex justify-center">
-              <p className="border-b border-black w-2/3 text-center py-1 text-sm font-medium">
-                {new Date(voucher.received_by_date).toLocaleDateString()}
-              </p>
-              <p className="text-xs ml-2 mt-1">DATE</p>
+          {/* Content Row */}
+          <div className="flex min-h-[160px]">
+            {/* Particulars Column */}
+            <div className="flex-1 border-r border-black p-2 align-top">{voucher.purpose}</div>
+
+            {/* Amount Column */}
+            <div className="w-[250px] flex">
+              {/* Integer Part */}
+              <div className="flex-1 border-r border-black p-2 text-right text-sm">
+                <div className="mb-1">₱{Math.floor(Number.parseFloat(voucher.amount.toString()))}</div>
+              </div>
+              {/* Decimal Part */}
+              <div className="w-[60px] p-2 text-left text-sm">
+                <div className="mb-1">.{Number.parseFloat(voucher.amount.toString()).toFixed(2).split(".")[1]}</div>
+              </div>
             </div>
           </div>
-          <div>
-            <p className="font-semibold mb-4">Approved by:</p>
-            <div className="flex flex-col items-center mb-4">
-              {voucher.approved_by_signature_url ? (
-                <Image
-                  src={getSignatureUrl(voucher.approved_by_signature_url) || "/placeholder.svg"}
-                  alt="Approved By Signature"
-                  width={150}
-                  height={80}
-                  className="border border-gray-300 mb-2"
-                  crossOrigin="anonymous"
-                />
-              ) : (
-                <div className="w-[150px] h-[80px] border border-gray-300 flex items-center justify-center text-gray-400 text-xs mb-2">
-                  No Signature
-                </div>
-              )}
-              <p className="border-b border-black w-full text-center py-1 text-sm font-medium">
-                {voucher.approved_by_name}
-              </p>
-              <p className="text-xs mt-1">PRINTED NAME AND SIGNATURE</p>
+
+          {/* Total Row */}
+          <div className="flex">
+            <div className="flex-1 border-r border-black p-2 text-right font-bold">TOTAL</div>
+            <div className="w-[250px] flex">
+              {/* Integer Part */}
+              <div className="flex-1 border-r border-black p-2 text-start text-sm font-bold">
+                ₱{Math.floor(Number.parseFloat(voucher.amount.toString()))}
+              </div>
+              {/* Decimal Part */}
+              <div className="w-[60px] p-2 text-left text-sm font-bold">
+                .{Number.parseFloat(voucher.amount.toString()).toFixed(2).split(".")[1]}
+              </div>
             </div>
-            <div className="flex justify-center">
-              <p className="border-b border-black w-2/3 text-center py-1 text-sm font-medium">
-                {new Date(voucher.approved_by_date).toLocaleDateString()}
-              </p>
-              <p className="text-xs ml-2 mt-1">DATE</p>
+          </div>
+        </div>
+        {/* Signatures Section */}
+        <div className="flex justify-between mt-8 text-sm">
+          <div className="flex-1 mr-8">
+            <div className="mb-4 font-semibold">Received by:</div>
+            <div className="flex gap-4 mb-8">
+              <div className="flex-1">
+                {voucher.received_by_signature_url && (
+                  <div className="mb-2 flex justify-center">
+                    <Image
+                      src={getSignatureUrl(voucher.received_by_signature_url) || "/placeholder.svg"}
+                      alt="Received By Signature"
+                      width={120}
+                      height={60}
+                      className="max-h-12 max-w-[120px] object-contain"
+                      crossOrigin="anonymous"
+                    />
+                  </div>
+                )}
+                <div className="border-b border-black min-h-[20px] mb-1 text-center pb-1">
+                  {voucher.received_by_name || ""}
+                </div>
+                <div className="text-xs text-center uppercase">PRINTED NAME AND SIGNATURE</div>
+              </div>
+              <div className="w-32">
+                <div className="border-b border-black min-h-[20px] mb-1 text-center pb-1 mt-14">
+                  {formatDate(voucher.received_by_date) || ""}
+                </div>
+                <div className="text-xs text-center uppercase">DATE</div>
+              </div>
+            </div>
+          </div>
+          <div className="flex-1 ml-8">
+            <div className="mb-4 font-semibold">Approved by:</div>
+            <div className="flex gap-4 mb-8">
+              <div className="flex-1">
+                {voucher.approved_by_signature_url && (
+                  <div className="mb-2 flex justify-center">
+                    <Image
+                      src={getSignatureUrl(voucher.approved_by_signature_url) || "/placeholder.svg"}
+                      alt="Approved By Signature"
+                      width={120}
+                      height={60}
+                      className="max-h-12 max-w-[120px] object-contain"
+                      crossOrigin="anonymous"
+                    />
+                  </div>
+                )}
+                <div className="border-b border-black min-h-[20px] mb-1 text-center pb-1">
+                  {voucher.approved_by_name || ""}
+                </div>
+                <div className="text-xs text-center uppercase">PRINTED NAME AND SIGNATURE</div>
+              </div>
+              <div className="w-32">
+                <div className="border-b border-black min-h-[20px] mb-1 text-center pb-1 mt-14">
+                  {formatDate(voucher.approved_by_date) || ""}
+                </div>
+                <div className="text-xs text-center uppercase">DATE</div>
+              </div>
             </div>
           </div>
         </div>

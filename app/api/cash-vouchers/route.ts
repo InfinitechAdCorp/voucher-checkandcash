@@ -45,6 +45,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const formData = await request.formData()
+
   if (!LARAVEL_API_URL) {
     return NextResponse.json({ message: "Laravel API URL is not configured." }, { status: 500 })
   }
